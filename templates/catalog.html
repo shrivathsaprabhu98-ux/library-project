@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalog | House Of Lumina's</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-body">
+    <header class="dashboard-header">
+        <nav class="container">
+            <div class="logo">
+                <h1>House Of <span>Lumina's</span></h1>
+            </div>
+            <div class="nav-links">
+                <a href="/catalog" class="active">Catalog</a>
+                {% if user.user_role not in ['admin', 'librarian'] %}
+                <a href="/shelf">My Shelf</a>
+                {% endif %}
+                {% if user.user_role in ['admin', 'librarian'] %}
+                <a href="/admin" class="admin-link">{% if user.user_role == 'admin' %}Admin Dashboard{% else %}Librarian Dashboard{% endif %}</a>
+                {% endif %}
+            </div>
+            <div class="user-profile">
+                <span>Welcome, <strong>{{ user.user_name }}</strong> ({{ user.user_role.capitalize() }})</span>
+                <a href="/logout" class="btn btn-outline btn-sm">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="catalog-controls animate-up">
+            <div class="search-box">
+                <input type="text" id="book-search" placeholder="Search by title, author, or ISBN...">
+                <span class="search-icon">🔍</span>
+            </div>
+            <div class="filter-box">
+                <select id="genre-filter">
+                    <option value="all">All Genres</option>
+                    <option value="Classic">Classic</option>
+                    <option value="Dystopian">Dystopian</option>
+                    <option value="Fantasy">Fantasy</option>
+                    <option value="Romance">Romance</option>
+                </select>
+            </div>
+            {% if user.user_role in ['admin', 'librarian'] %}
+            <div class="admin-actions">
+                <button id="add-book-btn" class="btn btn-primary">Add New Book</button>
+            </div>
+            {% endif %}
+        </section>
+
+        <section class="catalog-grid" id="catalog-grid">
+            <!-- Books will be injected here by JS -->
+            <div class="loader">Loading your library...</div>
+        </section>
+    </main>
+
+    <!-- Add Book Modal (Hidden by default) -->
+    <div id="add-book-modal" class="modal">
+        <div class="modal-content">
+            <h3>Add New Book</h3>
+            <form id="add-book-form">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label>Author</label>
+                    <input type="text" name="author" required>
+                </div>
+                <div class="form-group">
+                    <label>ISBN</label>
+                    <input type="text" name="isbn" required>
+                </div>
+                <div class="form-group">
+                    <label>Genre</label>
+                    <input type="text" name="genre" required>
+                </div>
+                <div class="form-group">
+                    <label>Cover Image URL</label>
+                    <input type="url" name="cover_url" placeholder="https://images.unsplash.com/...">
+                </div>
+                <div class="modal-btns">
+                    <button type="button" class="btn btn-outline" id="close-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Book Modal -->
+    <div id="edit-book-modal" class="modal">
+        <div class="modal-content">
+            <h3>Edit Book</h3>
+            <form id="edit-book-form">
+                <input type="hidden" name="id" id="edit-book-id">
+                <div class="form-group">
+                    <label>Title</label>
+                    <input type="text" name="title" id="edit-book-title" required>
+                </div>
+                <div class="form-group">
+                    <label>Author</label>
+                    <input type="text" name="author" id="edit-book-author" required>
+                </div>
+                <div class="form-group">
+                    <label>ISBN</label>
+                    <input type="text" name="isbn" id="edit-book-isbn" required>
+                </div>
+                <div class="form-group">
+                    <label>Genre</label>
+                    <input type="text" name="genre" id="edit-book-genre" required>
+                </div>
+                <div class="form-group">
+                    <label>Cover Image URL</label>
+                    <input type="url" name="cover_url" id="edit-book-cover" placeholder="https://images.unsplash.com/...">
+                </div>
+                <div class="modal-btns">
+                    <button type="button" class="btn btn-outline" id="close-edit-modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Book</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

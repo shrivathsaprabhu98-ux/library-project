@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if user.user_role == 'admin' %}Admin Dashboard{% else %}Librarian Dashboard{% endif %} | House Of Lumina's</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-nav { margin-bottom: 2rem; border-bottom: 2px solid #E5E7EB; display: flex; gap: 1rem; }
+        .admin-nav button { padding: 1rem 2rem; background: none; border: none; font-size: 1rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+        .admin-nav button.active { color: var(--primary); border-bottom-color: var(--primary); }
+        .admin-section { display: none; }
+        .admin-section.active { display: block; }
+        .admin-table { width: 100%; border-collapse: collapse; background: #fff; border-radius: var(--radius-md); overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 2rem;}
+        .admin-table th, .admin-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #F3F4F6; }
+        .admin-table th { background: #F9FAFB; font-weight: 600; }
+        .settings-card { background: #fff; padding: 2rem; border-radius: var(--radius-md); box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 500px; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        .form-group input { width: 100%; padding: 0.75rem; border: 1px solid #E5E7EB; border-radius: 6px; margin-bottom: 1rem; }
+        select.role-select { padding: 0.4rem; border-radius: 4px; border: 1px solid #ddd; }
+    </style>
+</head>
+<body class="dashboard-body">
+    <header class="dashboard-header">
+        <nav class="container">
+            <div class="logo"><h1>House Of <span>Lumina's</span></h1></div>
+            <div class="nav-links">
+                <a href="/catalog">Catalog</a>
+                <a href="/admin" class="active admin-link">{% if user.user_role == 'admin' %}Admin Dashboard{% else %}Librarian Dashboard{% endif %}</a>
+            </div>
+            <div class="user-profile">
+                <span>Welcome, <strong>{{ user.user_name }}</strong> ({{ user.user_role.capitalize() }})</span>
+                <a href="/logout" class="btn btn-outline btn-sm">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="shelf-header animate-up">
+            <h2>{% if user.user_role == 'admin' %}Admin Control Center{% else %}Librarian Control Center{% endif %}</h2>
+            <p>Manage your library, users, and settings from one place.</p>
+        </section>
+
+        <div class="admin-nav animate-up">
+            <button class="tab-btn active" onclick="switchTab('users')">Users</button>
+            <button class="tab-btn" onclick="switchTab('loans')">Active Loans</button>
+            {% if user.user_role == 'admin' %}
+            <button class="tab-btn" onclick="switchTab('settings')">Settings</button>
+            {% endif %}
+        </div>
+
+        <section id="users-sec" class="admin-section active animate-up">
+            <table class="admin-table">
+                <thead><tr><th>Name</th><th>Email</th><th>Role</th>{% if user.user_role == 'admin' %}<th>Actions</th>{% endif %}</tr></thead>
+                <tbody id="users-tbody"><tr><td colspan="4">Loading...</td></tr></tbody>
+            </table>
+        </section>
+
+        <section id="loans-sec" class="admin-section animate-up">
+            <table class="admin-table">
+                <thead><tr><th>Book Title</th><th>Borrower</th><th>Due Date</th><th>Status</th><th>Actions</th></tr></thead>
+                <tbody id="loans-tbody"><tr><td colspan="5">Loading...</td></tr></tbody>
+            </table>
+        </section>
+
+        <section id="settings-sec" class="admin-section animate-up" style="display: none;">
+            <h3>Library Settings</h3>
+            <form id="settings-form" class="settings-form">
+                <div class="form-group">
+                    <label for="borrow_duration_days">Default Borrow Duration (Days):</label>
+                    <input type="number" id="borrow_duration_days" name="borrow_duration_days" min="1" required>
+                </div>
+                <div class="form-group">
+                    <label for="fine_per_day">Late Fine Per Day (₹):</label>
+                    <input type="number" id="fine_per_day" name="fine_per_day" min="0" step="1" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Settings</button>
+            </form>
+        </section>
+    </main>
+    <script>
+        const CURRENT_USER_ROLE = '{{ user.user_role }}';
+    </script>
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+</body>
+</html>

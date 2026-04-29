@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>House Of Lumina's | Your Library, Simplified</title>
+    <meta name="description"
+        content="House Of Lumina's - Modern library management system that makes cataloging, tracking, and discovering books effortless.">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <nav id="main-nav">
+            <div class="logo">
+                <h1>House Of <span>Lumina's</span></h1>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#footer">Contact Us</a></li>
+            </ul>
+            <div class="nav-actions">
+                <!-- Authentication buttns removed -->
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-overlay">
+                <div class="hero-content">
+                    <h2 class="animate-up">Your Library, Simplified</h2>
+                    <p class="animate-up-delayed">Modern library management system that makes cataloging, tracking, and
+                        discovering books effortless</p>
+                    <div class="hero-btns animate-up-delayed-2">
+                        <a href="/login" class="btn btn-primary btn-lg">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features" id="features">
+            <div class="container">
+                <h3 class="section-title">Everything you need to manage your library efficiently</h3>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📖</div>
+                        <h4>Smart Cataloging</h4>
+                        <p>Easily catalog books with ISBN scanning, automatic metadata fetching, and bulk import
+                            capabilities</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">👥</div>
+                        <h4>Member Management</h4>
+                        <p>Track member registrations, borrowing history, and send automated notifications</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔍</div>
+                        <h4>Advanced Search</h4>
+                        <p>Find books instantly with powerful search filters by title, author, genre, and availability
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🕒</div>
+                        <h4>Due Date Tracking</h4>
+                        <p>Automated reminders for due dates and overdue items to keep your collection organized</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h4>Analytics Dashboard</h4>
+                        <p>Comprehensive insights into borrowing patterns, popular books, and library usage statistics
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🛡️</div>
+                        <h4>Secure & Reliable</h4>
+                        <p>Enterprise-grade security with role-based access control and automated backups</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section class="about" id="about">
+            <div class="container">
+                <div class="about-content">
+                    <div class="about-text">
+                        <h3 class="section-title">The Legacy of House Of Lumina's</h3>
+                        <p>Established with a vision to democratize knowledge and ignite a passion for reading,
+                            <strong>House Of Lumina's</strong> is more than just a library management system—it's a
+                            sanctuary for stories. We believe that every book has a soul, and every reader deserves a
+                            seamless journey to find it.
+                        </p>
+                        <p>Our platform was born from the need to merge classical library values with modern
+                            technological precision. Whether you are a small community archive or a sprawling academic
+                            institution, we provide the tools to preserve the past while embracing the future of digital
+                            organization.</p>
+                        <div class="about-stats">
+                            <div class="about-stat-item">
+                                <h4>500+</h4>
+                                <p>Libraries Powered</p>
+                            </div>
+                            <div class="about-stat-item">
+                                <h4>1M+</h4>
+                                <p>Books Cataloged</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+    </main>
+
+    <footer id="footer">
+        <div class="container footer-content">
+            <div class="footer-info">
+                <p>📍 123 Lumina Way, Knowledge City, LC 45678</p>
+                <p>📧 shrivathsaprabhu98@gmail.com | 📞 +91 7795272808</p>
+            </div>
+            <div class="footer-copyright">
+                <p>&copy; 2026 House Of Lumina's. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Shelf | House Of Lumina's</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="dashboard-body">
+    <header class="dashboard-header">
+        <nav class="container">
+            <div class="logo">
+                <h1>House Of <span>Lumina's</span></h1>
+            </div>
+            <div class="nav-links">
+                <a href="/catalog">Catalog</a>
+                {% if user.user_role not in ['admin', 'librarian'] %}
+                <a href="/shelf" class="active">My Shelf</a>
+                {% endif %}
+                {% if user.user_role in ['admin', 'librarian'] %}
+                <a href="/admin" class="admin-link">{% if user.user_role == 'admin' %}Admin Dashboard{% else %}Librarian Dashboard{% endif %}</a>
+                {% endif %}
+            </div>
+            <div class="user-profile">
+                <span>Welcome, <strong>{{ user.user_name }}</strong></span>
+                <a href="/logout" class="btn btn-outline btn-sm">Logout</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="shelf-header animate-up">
+            <h2>Your Borrowed Books</h2>
+            <p>Keep track of your reading journey and upcoming due dates.</p>
+        </section>
+
+        <div class="books-grid" id="shelf-grid">
+            <!-- Books injected via JS -->
+        </div>
+
+        <section class="shelf-header animate-up" style="margin-top: 4rem;">
+            <h2>Return History</h2>
+            <p>Books you have previously borrowed and returned.</p>
+        </section>
+        
+        <div class="books-grid" id="history-grid">
+            <!-- Returned Books injected via JS -->
+        </div>    <div class="loader">Loading your shelf...</div>
+        </section>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+
+</html>

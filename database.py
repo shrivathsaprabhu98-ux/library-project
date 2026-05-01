@@ -55,6 +55,13 @@ def init_db():
     cursor.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('borrow_duration_days', '14')")
     cursor.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('fine_per_day', '2')")
     
+    # Add Indexes for performance
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_users_email ON users(email)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_books_isbn ON books(isbn)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_loans_user ON loans(user_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_loans_book ON loans(book_id)')
+    cursor.execute('CREATE INDEX IF NOT EXISTS idx_loans_status ON loans(status)')
+    
     # Safely add new columns to loans if they don't exist
     try:
         cursor.execute("ALTER TABLE loans ADD COLUMN return_date DATE")

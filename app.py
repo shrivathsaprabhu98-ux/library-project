@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify, request, redirect, url_for, flash, session
 from database import get_db_connection, init_db
+from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3
 from datetime import datetime, timedelta
 
@@ -20,19 +21,20 @@ def login():
         password = request.form['password']
         
         conn = get_db_connection()
-        user = conn.execute('SELECT * FROM users WHERE email = ? AND password = ?', (email, password)).fetchone()
-        conn.close()
-        
-        if user:
-            session['user_id'] = user['id']
-            session['user_name'] = user['name']
-            session['user_role'] = user['role']
-            if user['role'] in ['admin', 'librarian']:
-                return redirect(url_for('admin'))
-            return redirect(url_for('catalog'))
-        else:
-            flash("Incorrect Email or Password")
-            return redirect(url_for('login'))
+        try:
+            user = conn.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+            if user and check_password_hash(user['password'], password):
+                session['user_id'] = user['id']
+                session['user_name'] = user['name']
+                session['user_role'] = user['role']
+                if user['role'] in ['admin', 'librarian']:
+                    return redirect(url_for('admin'))
+                return redirect(url_for('catalog'))
+            else:
+                flash("Incorrect Email or Password")
+                return redirect(url_for('login'))
+        finally:
+            conn.close()
             
     return render_template('login.html')
 
@@ -44,17 +46,20 @@ def signup():
         password = request.form['password']
         role = request.form.get('role', 'user')
         
+        hashed_password = generate_password_hash(password)
+        
+        conn = get_db_connection()
         try:
-            conn = get_db_connection()
             conn.execute('INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)',
-                         (name, email, password, role))
+                         (name, email, hashed_password, role))
             conn.commit()
-            conn.close()
             flash("Account created! Please log in.")
             return redirect(url_for('login'))
         except sqlite3.IntegrityError:
             flash("Email already exists.")
             return redirect(url_for('signup'))
+        finally:
+            conn.close()
             
     return render_template('signup.html')
 
@@ -112,10 +117,22 @@ def delete_book(book_id):
         return jsonify({"error": "Unauthorized"}), 403
     
     conn = get_db_connection()
-    conn.execute('DELETE FROM books WHERE id = ?', (book_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({"message": "Book deleted successfully"})
+    try:
+        # Check if book has active loans
+        active_loan = conn.execute('SELECT id FROM loans WHERE book_id = ? AND status = "active"', (book_id,)).fetchone()
+        if active_loan:
+            return jsonify({"error": "Cannot delete book with active loans. Return the book first."}), 400
+            
+        # Delete history of loans for this book too
+        conn.execute('DELETE FROM loans WHERE book_id = ?', (book_id,))
+        conn.execute('DELETE FROM books WHERE id = ?', (book_id,))
+        conn.commit()
+        return jsonify({"message": "Book and its loan history deleted successfully"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
 
 @app.route('/api/books/<int:book_id>', methods=['PUT'])
 def update_book(book_id):
@@ -297,32 +314,24 @@ def update_user_role(user_id):
 def delete_user(user_id):
     if session.get('user_role') != 'admin':
         return jsonify({"error": "Unauthorized"}), 403
+    
     conn = get_db_connection()
-    conn.execute('DELETE FROM users WHERE id=?', (user_id,))
-    conn.commit()
-    conn.close()
-    return jsonify({"message": "User deleted"})
-
-@app.route('/api/admin/settings', methods=['GET', 'POST'])
-def manage_settings():
-    if session.get('user_role') != 'admin':
-        return jsonify({"error": "Unauthorized"}), 403
-    conn = get_db_connection()
-    if request.method == 'POST':
-        data = request.json
-        for k, v in data.items():
-            conn.execute('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', (k, str(v)))
+    try:
+        # First, delete all loans associated with this user
+        conn.execute('DELETE FROM loans WHERE user_id = ?', (user_id,))
+        # Then delete the user
+        conn.execute('DELETE FROM users WHERE id = ?', (user_id,))
         conn.commit()
+        return jsonify({"message": "User and associated records deleted successfully"})
+    except Exception as e:
+        conn.rollback()
+        return jsonify({"error": str(e)}), 500
+    finally:
         conn.close()
-        return jsonify({"message": "Settings updated"})
-    else:
-        settings = conn.execute('SELECT * FROM settings').fetchall()
-        conn.close()
-        return jsonify({s['key']: s['value'] for s in settings})
 
 @app.route('/api/status')
 def status():
     return jsonify({"status": "Library System Backend is running", "version": "1.2.0"})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)

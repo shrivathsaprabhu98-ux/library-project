@@ -28,31 +28,43 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!catalogGrid) return;
         
         if (books.length === 0) {
-            catalogGrid.innerHTML = '<div class="loader">No books found.</div>';
+            catalogGrid.innerHTML = '<div class="loader">No books found matching your criteria.</div>';
             return;
         }
 
-        catalogGrid.innerHTML = books.map(book => `
-            <div class="book-card animate-up">
-                <div class="book-cover">
-                    <img src="${book.cover_url || 'https://placehold.co/400x600/e2e8f0/475569?text=Cover+Unavailable'}" onerror="this.onerror=null; this.src='https://placehold.co/400x600/e2e8f0/475569?text=Cover+Unavailable';" alt="${book.title}">
-                    <span class="status-badge status-${book.status}">${book.status}</span>
-                </div>
-                <div class="book-info">
-                    <h3>${book.title}</h3>
-                    <p class="book-author">by ${book.author}</p>
-                    <div class="book-meta">
-                        <span class="book-genre">${book.genre}</span>
-                        <div>
-                        ${!addBookBtn ? (book.status === 'available' 
-                            ? `<button onclick="borrowBook(${book.id})" class="btn btn-primary btn-sm">Borrow</button>` 
-                            : `<span class="btn btn-outline btn-sm disabled">Unavailable</span>`) : ''}
-                        ${addBookBtn ? `<button onclick="openEditModal(${book.id})" class="btn btn-outline btn-sm" style="margin-left: 5px;">Edit</button>` : ''}
+        catalogGrid.innerHTML = books.map(book => {
+            const coverUrl = book.cover_url || 'https://placehold.co/400x600/e2e8f0/475569?text=No+Cover';
+            return `
+                <div class="book-card animate-up">
+                    <div class="book-cover">
+                        <img src="${coverUrl}" 
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x600/e2e8f0/475569?text=Cover+Error';" 
+                             alt="${book.title}"
+                             loading="lazy">
+                        <span class="status-badge status-${book.status}">${book.status}</span>
+                    </div>
+                    <div class="book-info">
+                        <h3>${book.title}</h3>
+                        <p class="book-author">by ${book.author}</p>
+                        <div class="book-meta">
+                            <span class="book-genre">${book.genre}</span>
+                            <div>
+                            ${!addBookBtn ? `
+                                ${book.status === 'available' 
+                                    ? `<button onclick="borrowBook(${book.id})" class="btn btn-primary btn-sm">Borrow</button>` 
+                                    : `<span class="btn btn-outline btn-sm disabled">Unavailable</span>`}
+                            ` : `
+                                <div style="display: flex; flex-direction: column; gap: 5px;">
+                                    <button onclick="openEditModal(${book.id})" class="btn btn-outline btn-sm">Edit</button>
+                                    <button onclick="deleteBook(${book.id})" class="btn btn-outline btn-sm" style="color: #ef4444; border-color: #ef4444;">Delete</button>
+                                </div>
+                            `}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     };
 
     // --- FETCH & RENDER SHELF ---
@@ -61,17 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const response = await fetch('/api/my-loans');
             const loans = await response.json();
-            renderShelf(loans);
-        } catch (err) {
-            console.error('Failed to fetch shelf:', err);
-            shelfGrid.innerHTML = '<p class="error">Failed to load your shelf.</p>';
             
             const historyGrid = document.getElementById('history-grid');
-
             const activeLoans = loans.filter(l => l.loan_status === 'active');
             const returnedLoans = loans.filter(l => l.loan_status === 'returned');
 
-            if(activeLoans.length === 0) {
+            if (activeLoans.length === 0) {
                 shelfGrid.innerHTML = '<p class="empty-state">Your active shelf is empty. Go to the catalog to borrow some books!</p>';
             } else {
                 shelfGrid.innerHTML = activeLoans.map(loan => `
@@ -92,8 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 `).join('');
             }
 
-            if(historyGrid) {
-                if(returnedLoans.length === 0) {
+            if (historyGrid) {
+                if (returnedLoans.length === 0) {
                     historyGrid.innerHTML = '<p class="empty-state">No return history yet.</p>';
                 } else {
                     historyGrid.innerHTML = returnedLoans.map(loan => `
@@ -116,8 +123,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     `).join('');
                 }
             }
-        } catch (error) {
-            console.error('Error fetching shelf:', error);
+        } catch (err) {
+            console.error('Failed to fetch shelf:', err);
+            shelfGrid.innerHTML = '<p class="error">Failed to load your shelf.</p>';
         }
     };
 
@@ -162,6 +170,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } catch (err) {
             console.error('Return failed:', err);
+        }
+    };
+
+    window.deleteBook = async (bookId) => {
+        if (!confirm('Are you sure you want to delete this book? This will also remove its loan history.')) return;
+        try {
+            const response = await fetch(`/api/books/${bookId}`, {
+                method: 'DELETE'
+            });
+            const result = await response.json();
+            if (response.ok) {
+                alert('Book deleted successfully');
+                fetchBooks();
+            } else {
+                alert('Error: ' + result.error);
+            }
+        } catch (err) {
+            console.error('Delete book failed:', err);
         }
     };
 

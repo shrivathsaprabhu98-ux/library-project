@@ -46,6 +46,8 @@
                     <option value="Dystopian">Dystopian</option>
                     <option value="Fantasy">Fantasy</option>
                     <option value="Romance">Romance</option>
+                    <option value="Non-Fiction">Non-Fiction</option>
+                    <option value="Science Fiction">Science Fiction</option>
                 </select>
             </div>
             {% if user.user_role in ['admin', 'librarian'] %}
@@ -80,7 +82,14 @@
                 </div>
                 <div class="form-group">
                     <label>Genre</label>
-                    <input type="text" name="genre" required>
+                    <select name="genre" required style="width: 100%; padding: 0.75rem 1rem; background: #fff; border: 1px solid #E5E7EB; border-radius: var(--radius-sm);">
+                        <option value="Classic">Classic</option>
+                        <option value="Dystopian">Dystopian</option>
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Science Fiction">Science Fiction</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Cover Image URL</label>
@@ -114,7 +123,14 @@
                 </div>
                 <div class="form-group">
                     <label>Genre</label>
-                    <input type="text" name="genre" id="edit-book-genre" required>
+                    <select name="genre" id="edit-book-genre" required style="width: 100%; padding: 0.75rem 1rem; background: #fff; border: 1px solid #E5E7EB; border-radius: var(--radius-sm);">
+                        <option value="Classic">Classic</option>
+                        <option value="Dystopian">Dystopian</option>
+                        <option value="Fantasy">Fantasy</option>
+                        <option value="Romance">Romance</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Science Fiction">Science Fiction</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Cover Image URL</label>

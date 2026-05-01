@@ -43,11 +43,8 @@
         </section>
 
         <div class="admin-nav animate-up">
-            <button class="tab-btn active" onclick="switchTab('users')">Users</button>
-            <button class="tab-btn" onclick="switchTab('loans')">Active Loans</button>
-            {% if user.user_role == 'admin' %}
-            <button class="tab-btn" onclick="switchTab('settings')">Settings</button>
-            {% endif %}
+            <button class="tab-btn active" onclick="switchTab('users', event)">Users</button>
+            <button class="tab-btn" onclick="switchTab('loans', event)">Active Loans</button>
         </div>
 
         <section id="users-sec" class="admin-section active animate-up">
@@ -64,20 +61,7 @@
             </table>
         </section>
 
-        <section id="settings-sec" class="admin-section animate-up" style="display: none;">
-            <h3>Library Settings</h3>
-            <form id="settings-form" class="settings-form">
-                <div class="form-group">
-                    <label for="borrow_duration_days">Default Borrow Duration (Days):</label>
-                    <input type="number" id="borrow_duration_days" name="borrow_duration_days" min="1" required>
-                </div>
-                <div class="form-group">
-                    <label for="fine_per_day">Late Fine Per Day (₹):</label>
-                    <input type="number" id="fine_per_day" name="fine_per_day" min="0" step="1" required>
-                </div>
-                <button type="submit" class="btn btn-primary">Save Settings</button>
-            </form>
-        </section>
+
     </main>
     <script>
         const CURRENT_USER_ROLE = '{{ user.user_role }}';
